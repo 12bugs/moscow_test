@@ -1,0 +1,14 @@
+# окружение и кэш
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+.DS_Store
+
+# секреты
+.env
+
+# данные (исходник большой и может быть конфиденциальным)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
