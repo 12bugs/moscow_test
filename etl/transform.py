@@ -175,10 +175,11 @@ def joint_purchase(df, qlog):
     return df.drop(columns=["joint_purchase"])
 
 
-def fill_complex(df, qlog):
-    miss = df["complex"].isna()
-    df["complex"] = df["complex"].fillna("Не указан")
-    qlog.add(15, "Пустой комплекс", miss.sum(), "«Не указан»")
+def fill_unknown(df, qlog):
+    for rule_no, col, label in [(15, "complex", "Пустой комплекс"), (16, "status", "Пустой статус")]:
+        miss = df[col].isna()
+        df[col] = df[col].fillna("Не указан")
+        qlog.add(rule_no, label, miss.sum(), "«Не указан»")
     return df
 
 
@@ -243,7 +244,7 @@ def main():
 
     for step in [drop_full_duplicates, cast_types, per_unit_flag, reduction_validity,
                  date_validity, contract_conflict, normalize_winner, classify_rows,
-                 zero_bids, nmck_missing, method_group, joint_purchase, fill_complex]:
+                 zero_bids, nmck_missing, method_group, joint_purchase, fill_unknown]:
         df = step(df, qlog)
 
     lots = add_lot_metrics(build_lots(df, qlog))
