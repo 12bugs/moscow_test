@@ -3,7 +3,7 @@
 Сравнительный анализ конкуренции на торгах: ETL-пайплайн на Python, хранилище данных
 в PostgreSQL (схема «звезда»), витрины на SQL и дашборд в Apache Superset.
 
-![Дашборд](superset/screenshots/overview.png)
+![Дашборд](superset/screenshots/overview.jpg)
 
 ## Главные выводы
 
