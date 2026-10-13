@@ -20,5 +20,39 @@ services:
       retries: 10
     restart: unless-stopped
 
+  superset-init:
+    build: ./docker/superset
+    image: dwh-superset:4.1.1
+    env_file: .env
+    environment:
+      SUPERSET_CONFIG_PATH: /app/pythonpath/superset_config.py
+    volumes:
+      - ./docker/superset/superset_config.py:/app/pythonpath/superset_config.py:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      bash -c "superset db upgrade &&
+                (superset fab create-admin
+                  --username $${SUPERSET_ADMIN_USER} --password $${SUPERSET_ADMIN_PASSWORD}
+                  --firstname Admin --lastname User --email admin@example.com || true) &&
+                superset init"
+    restart: "no"
+
+  superset:
+    build: ./docker/superset
+    image: dwh-superset:4.1.1
+    env_file: .env
+    environment:
+      SUPERSET_CONFIG_PATH: /app/pythonpath/superset_config.py
+    volumes:
+      - ./docker/superset/superset_config.py:/app/pythonpath/superset_config.py:ro
+    ports:
+      - "8088:8088"
+    depends_on:
+      superset-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
 volumes:
   pg_data:
