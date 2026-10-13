@@ -26,9 +26,15 @@ BUILD_SCRIPTS = [
     "02_dim_date.sql",     # календарь
     "03_load_dims.sql",    # справочники
     "04_load_fact.sql",    # факт
+    "06_marts.sql",        # витрины (удаляются каскадно при пересоздании таблиц)
 ]
 CHECKS_SCRIPT = "05_checks.sql"
+TOTAL_STEPS = 3
 
+
+def step(n, title):
+    bar = "█" * n + "░" * (TOTAL_STEPS - n)
+    log.info("[%s] шаг %d/%d: %s", bar, n, TOTAL_STEPS, title)
 
 
 def copy_insert(table, conn, keys, data_iter):
@@ -80,10 +86,13 @@ def main():
     engine = get_engine()
     started = time.perf_counter()
 
+    step(1, "staging ← lots.parquet")
     load_staging(engine)
 
+    step(2, "справочники и факт (SQL)")
     build_warehouse(engine)
 
+    step(3, "сверка dwh со staging")
     run_checks(engine)
 
     log.info("Готово за %.0f c", time.perf_counter() - started)
